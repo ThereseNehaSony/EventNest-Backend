@@ -1,0 +1,48 @@
+import express, { Application, NextFunction, Request, Response } from "express";
+import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
+import  adminRoutes from "../infrastructure/routes/adminRoutes";
+import categoryRoutes from "../infrastructure/routes/userRoutes";
+import { dependencies } from "../config/dependencies";
+import cors from 'cors'
+// import {  consumeUserListResponse } from '../infrastructure/RabbitMQ/consumer'
+// import { requestUserList } from "../infrastructure/RabbitMQ/publisher";
+import path from 'path';
+dotenv.config();
+const app: Application = express();
+const PORT: number = Number(process.env.PORT) || 3003;
+
+app.set("trust proxy", true);
+
+const corsOptions = {
+  origin:'http://localhost:3000',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+}
+app.use(cors(corsOptions));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// app.use("/admin", adminRoutes);
+app.use("/event", categoryRoutes);
+
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  console.error(err);
+  const errorResponse = {
+    errors: [{ message: err?.message || "Something went wrong" }],
+  };
+  return res.status(500).json(errorResponse);
+});
+
+app.listen(PORT, () => {
+  console.log(`connected to event service at ${PORT}`);
+  // requestUserList()
+  // consumeUserListResponse();
+});
+
+export default app;
