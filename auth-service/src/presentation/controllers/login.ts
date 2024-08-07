@@ -1,8 +1,67 @@
+// import { NextFunction, Request, Response } from "express";
+// import { IDependencies } from "../../application/interfaces/IDependencies";
+// import { UserEntity } from "../../domain/entities";
+// import jwt from "jsonwebtoken";
+
+
+// export const loginController = (dependencies: IDependencies) => {
+//   const {
+//     useCases: { loginUserUseCase },
+//   } = dependencies;
+
+//   return async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const userCredentials = req.body;
+//       const user: UserEntity | null = await loginUserUseCase(
+//         dependencies
+//       ).execute(userCredentials);
+//       if (user) {
+//         if (user.status === "blocked") {
+//           return res.status(403).json({ message: "You are blocked." });
+//         }
+//         let payload = {
+//           _id: String(user?._id),
+//           email: user?.email!,
+//           role: user?.role!,
+//         };
+//         const accessToken = jwt.sign(
+//           payload,
+//           String(process.env.ACCESS_TOKEN_SECRET),
+//           { expiresIn: "1h" }
+//         );
+//         console.log(accessToken, "login token");
+
+//         res.cookie("user_jwt", accessToken, {
+//           httpOnly: true,
+//           secure: true,
+//           sameSite: "none",
+//         });
+
+        
+//         res.status(200).json({
+//           success: true,
+//           user: user,
+//           message: "User verified!",
+//         });
+//       }
+//     } catch (error: any) {
+//       next(error);
+//     }
+//   };
+// };
+
 import { NextFunction, Request, Response } from "express";
 import { IDependencies } from "../../application/interfaces/IDependencies";
 import { UserEntity } from "../../domain/entities";
 import jwt from "jsonwebtoken";
 
+const generateAccessToken = (payload: object) => {
+  return jwt.sign(payload, String(process.env.ACCESS_TOKEN_SECRET), { expiresIn: "15m" });
+};
+
+const generateRefreshToken = (payload: object) => {
+  return jwt.sign(payload, String(process.env.REFRESH_TOKEN_SECRET), { expiresIn: "7d" });
+};
 
 export const loginController = (dependencies: IDependencies) => {
   const {
@@ -12,24 +71,25 @@ export const loginController = (dependencies: IDependencies) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userCredentials = req.body;
-      const user: UserEntity | null = await loginUserUseCase(
-        dependencies
-      ).execute(userCredentials);
+      const user: UserEntity | null = await loginUserUseCase(dependencies).execute(userCredentials);
+      
       if (user) {
         if (user.status === "blocked") {
           return res.status(403).json({ message: "You are blocked." });
         }
+
         let payload = {
-          _id: String(user?._id),
-          email: user?.email!,
-          role: user?.role!,
+          _id: String(user._id),
+          email: user.email,
+          role: user.role,
         };
-        const accessToken = jwt.sign(
-          payload,
-          String(process.env.ACCESS_TOKEN_SECRET),
-          { expiresIn: "1h" }
-        );
-        console.log(accessToken, "login token");
+
+        const accessToken = generateAccessToken(payload);
+        const refreshToken = generateRefreshToken(payload);
+
+        // Optional: save refresh token to user's record
+        // user.refreshToken = refreshToken;
+        // await user.save();
 
         res.cookie("user_jwt", accessToken, {
           httpOnly: true,
@@ -37,7 +97,13 @@ export const loginController = (dependencies: IDependencies) => {
           sameSite: "none",
         });
 
-        
+        res.cookie("refreshToken", refreshToken, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
+          path: "/auth/refresh-token", // ensure path matches refresh endpoint
+        });
+
         res.status(200).json({
           success: true,
           user: user,

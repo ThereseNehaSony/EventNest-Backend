@@ -18,7 +18,7 @@ export const publishUserCreated = (user: any) => {
       channel.assertExchange(exchange, 'topic', {
         durable: false
       });
-
+      console.log("publishing user.........")
       channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(user)));
       
     });

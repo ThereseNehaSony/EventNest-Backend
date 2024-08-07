@@ -1,8 +1,8 @@
 import { Router } from "express";
-import authenticateJWT from '../middlewares/authMiddleware';
+import {authenticateJWT} from '../../middleware/authMiddleware';
 import { IDependencies } from "../../application/interfaces/IDependencies";
 import { controllers } from "../../presentation/controllers";
-import { requestOtp, resetPassword, verifyOtp  } from "../../presentation/controllers/authController";
+import {refreshTokenController, requestOtp, resetPassword, verifyOtp, changePassword,resendOtpController  } from "../../presentation/controllers/authController";
 //const { forgotPassword, verifyOtp, resetPassword } = require('../../presentation/controllers/);
 export const authRoutes = (dependencies: IDependencies) => {
     const { signup,login,
@@ -29,12 +29,13 @@ export const authRoutes = (dependencies: IDependencies) => {
 
     router.route("/request-otp")
         .post(requestOtp)
-        
-     router.post('/verify-otp', verifyOtp);
+
+    router.post('/verify-otp', verifyOtp);
     router.post('/reset-password', resetPassword);
 
+    router.post('/change-password', changePassword);
 
-    // router.post('/forgot-password', forgotPassword);
-    // router.post('/reset-password', resetPassword);
+    router.post("/send-otp", resendOtpController(dependencies));
+    router.post('/refresh-token', refreshTokenController);
     return router;
 }

@@ -1,9 +1,8 @@
 // src/controllers/userController.ts
 import { Request, Response,NextFunction } from 'express';
-import {Host } from '../../infrastructure/database/mongoDB/models/hostModel'; // Adjust the path according to your project structure
-//import { IUser } from '../../infrastructure/database/mongoDB/models/userModel'; // Importing the interface if needed
+import {Host } from '../../infrastructure/database/mongoDB/models/hostModel'; 
+import { publishToQueue } from '../../infrastructure/RabbitMQ/publisher';
 
-// Extend Request interface to include the user object
 interface CustomRequest extends Request {
   user?: {
     id: string;
@@ -46,6 +45,8 @@ export const getHostDetails = async (req: Request, res: Response, next: NextFunc
       });
     }
 
+    
+
     res.json({
       success: true,
       data: host,
@@ -55,22 +56,29 @@ export const getHostDetails = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-
 export const updateHostStatus = async (req: Request, res: Response) => {
   try {
-    
     const { newStatus } = req.body;
-    const {hostId} = req.body
+    const { hostId } = req.body;
   
     const host = await Host.findByIdAndUpdate(
       hostId,
-      { status:newStatus },
+      { status: newStatus },
       { new: true }
     );
-   console.log(host)
+  console.log(host,"host..")
+  console.log("verifiesd")
     if (!host) {
       return res.status(404).json({ message: 'Host not found' });
     }
+
+    const message = JSON.stringify({
+      userId: host._id, 
+      status: newStatus,
+    });
+
+    // Publishing 
+    await publishToQueue('hostStatusUpdate', message);
 
     res.status(200).json(host);
   } catch (error) {

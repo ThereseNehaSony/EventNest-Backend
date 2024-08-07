@@ -16,7 +16,7 @@ export const authenticate = (req: CustomRequest, res: Response, next: NextFuncti
   const token = req.cookies.user_jwt;
   console.log(token,"token...")
   if (!token) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
+    return res.status(401).json({ message: 'No token, authorization denied host-service' });
   }
 
   try {
@@ -29,7 +29,7 @@ export const authenticate = (req: CustomRequest, res: Response, next: NextFuncti
     console.log(decoded,"decoded.........");
     
     if (!decoded || !decoded._id) {
-      return res.status(401).json({ message: 'Invalid token, authorization denied' });
+      return res.status(401).json({ message: 'Invalid token, authorization denied host' });
     }
 
     req.user = { id: decoded._id };

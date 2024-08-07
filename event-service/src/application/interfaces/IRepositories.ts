@@ -1,5 +1,7 @@
-import { IUserEntity } from "../../domain/entities/userEntities";
+//import { MovieEntity } from "../../domain/entities/movieEntity";
 
 export interface IRepositories {
-  updateStatus:({id, status}: any) => Promise<IUserEntity | null>
+ 
+  getAllCategories: ({ page, limit }: any) => Promise<any | null>;
+  
 }

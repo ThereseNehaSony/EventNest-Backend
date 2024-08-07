@@ -11,9 +11,11 @@ interface DecodedToken extends JwtPayload {
   id: string;
 }
 
-export const authenticate = (req: CustomRequest, res: Response, next: NextFunction) => {
+
+export const authenticateJWT = (req: CustomRequest, res: Response, next: NextFunction) => {
   const token = req.cookies.user_jwt;
   console.log(token,"token...")
+  
   if (!token) {
     return res.status(401).json({ message: 'No token authorization denied' });
   }
@@ -39,4 +41,3 @@ export const authenticate = (req: CustomRequest, res: Response, next: NextFuncti
     res.status(401).json({ message: 'Token is not valid', error });
   }
 };
-

@@ -60,6 +60,9 @@ export const signupController = (dependencies: IDependencies) => {
               userCredentials.otp
             );
           }
+         
+         
+
           // to check if it is google signup
             if (!userCredentials.password) {
               userCredentials.password = await generatePassword();

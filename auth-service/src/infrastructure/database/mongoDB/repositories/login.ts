@@ -10,7 +10,8 @@ export const login = async (
         console.log(data)
         const user : UserEntity | null =  await User.findOne({email:data.email})
         console.log(user,'new user,repo,signup')
-        // check if password is same or not
+       
+        // check  password 
         if(user) {
             if(data.google) {
                 return user as UserEntity

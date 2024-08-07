@@ -1,19 +1,20 @@
 import amqplib from 'amqplib';
 
-//const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
-const RABBITMQ_URL = 'amqp://127.0.0.1:5672';
-export const requestUserList = async () => {
-  const connection = await amqplib.connect(RABBITMQ_URL);
-  const channel = await connection.createChannel();
-  const requestQueue = 'user_list_request';
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://127.0.0.1:5672';
 
-  await channel.assertQueue(requestQueue, { durable: false });
-  console.log('Sending request for user list to RabbitMQ');
-  channel.sendToQueue(requestQueue, Buffer.from('Requesting user list'));
+export const publishToQueue = async (queue: string, message: any) => {
+  try {
+    const connection = await amqplib.connect(RABBITMQ_URL);
+    const channel = await connection.createChannel();
 
-  setTimeout(() => {
-    connection.close();
-  }, 500);
+    await channel.assertQueue(queue, { durable: true });
+    await channel.sendToQueue(queue, Buffer.from(message), { persistent: true });
+
+    console.log('Message sent to queue:', message);
+
+    await channel.close();
+    await connection.close();
+  } catch (error) {
+    console.error('Error in publishing to queue:', error);
+  }
 };
-
-

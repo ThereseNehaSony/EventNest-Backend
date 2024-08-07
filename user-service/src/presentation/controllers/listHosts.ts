@@ -23,7 +23,7 @@ export const listHostsController = () => {
           _id: user._id,
           username: user.username,
           email: user.email,
-        //  dateOfJoining: formattedDate,
+       
           status: user.status
         };
       });

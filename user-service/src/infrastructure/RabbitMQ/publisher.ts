@@ -16,20 +16,24 @@ export const requestUserList = async () => {
   }, 500);
 };
 
-export const publishUserBlockedEvent = async (userId:any) => {
+
+export const publishUserBlockedEvent = async (userId: string, operation: 'block' | 'unblock') => {
   const connection = await amqplib.connect(RABBITMQ_URL);
   const channel = await connection.createChannel();
-  const userBlockedQueue = 'user_blocked_event';
+  const queue = 'user_blocked_event';
 
-  await channel.assertQueue(userBlockedQueue, { durable: false });
-  console.log('Publishing user blocked event');
+  const message = JSON.stringify({
+    userId,
+    operation,
+  });
 
-  const event = { userId };
-  channel.sendToQueue(userBlockedQueue, Buffer.from(JSON.stringify(event)));
+  await channel.assertQueue(queue, { durable: false });
+  await channel.sendToQueue(queue, Buffer.from(message));
 
-  setTimeout(() => {
-    connection.close();
-  }, 500);
+  console.log(`Message sent to queue: ${message}`);
+
+  await channel.close();
+  await connection.close();
 };
 
 

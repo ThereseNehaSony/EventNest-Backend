@@ -1,1 +1,1 @@
-export * from './updateStatusUseCase'
+export * from './getAllCategoriesUseCase'

@@ -1,6 +1,7 @@
-import { IUpdateStatusUseCase } from "../../domain/IUseCases";
-import { IDependencies } from "./IDependencies";
 
+import { IGetAllCategoriesUseCase } from "../../domain/IUseCases/IGetAllCategoriesUseCse";
+import { IDependencies } from "./IDependencies";
 export interface IUseCases {
-  updateStatusUseCase: (dependencies: IDependencies) => IUpdateStatusUseCase;
+ 
+  getAllCategoriesUseCase: (dependencies: IDependencies) => IGetAllCategoriesUseCase;
 }

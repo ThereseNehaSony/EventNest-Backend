@@ -1,13 +1,14 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-import  adminRoutes from "../infrastructure/routes/adminRoutes";
-import categoryRoutes from "../infrastructure/routes/userRoutes";
-import { dependencies } from "../config/dependencies";
+
+import {adminRoutes} from "../infrastructure/routes/adminRoutes";
+
 import cors from 'cors'
 // import {  consumeUserListResponse } from '../infrastructure/RabbitMQ/consumer'
 // import { requestUserList } from "../infrastructure/RabbitMQ/publisher";
 import path from 'path';
+import { dependencies } from "../config/dependencies";
 dotenv.config();
 const app: Application = express();
 const PORT: number = Number(process.env.PORT) || 3003;
@@ -28,7 +29,7 @@ app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // app.use("/admin", adminRoutes);
-app.use("/event", categoryRoutes);
+app.use("/event", adminRoutes(dependencies));
 
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
