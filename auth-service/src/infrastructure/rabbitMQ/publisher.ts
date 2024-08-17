@@ -36,18 +36,15 @@ export const publishHostCreated = (hostDetails: any) => {
         throw error1;
       }
 
-      // Name of the exchange
       const exchange = 'host_events';
 
-      // Declare the exchange
       channel.assertExchange(exchange, 'fanout', {
         durable: false,
       });
 
-      // Convert host details to JSON
       const message = JSON.stringify(hostDetails);
 
-      // Publish the message to the exchange
+      // Publish message 
       channel.publish(exchange, '', Buffer.from(message));
       console.log(`[x] Sent host created message: ${message}`);
 

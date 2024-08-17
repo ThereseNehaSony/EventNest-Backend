@@ -1,9 +1,7 @@
-// src/controllers/userController.ts
-import { Request, Response } from 'express';
-import { User } from '../../infrastructure/database/mongoDB/models/userModel'; // Adjust the path according to your project structure
-//import { IUser } from '../../infrastructure/database/mongoDB/models/userModel'; // Importing the interface if needed
 
-// Extend Request interface to include the user object
+import { Request, Response } from 'express';
+import { User } from '../../infrastructure/database/mongoDB/models/userModel'; 
+
 interface CustomRequest extends Request {
   user?: {
     id: string;

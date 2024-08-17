@@ -67,7 +67,7 @@ export const updateHostStatus = async (req: Request, res: Response) => {
       { new: true }
     );
   console.log(host,"host..")
-  console.log("verifiesd")
+  console.log("verified")
     if (!host) {
       return res.status(404).json({ message: 'Host not found' });
     }
@@ -77,9 +77,8 @@ export const updateHostStatus = async (req: Request, res: Response) => {
       status: newStatus,
     });
 
-    // Publishing 
-    await publishToQueue('hostStatusUpdate', message);
-
+    // Publish
+    await publishToQueue('hostStatusExchange', message);
     res.status(200).json(host);
   } catch (error) {
     res.status(500).json({ message: 'Error updating host status', error });

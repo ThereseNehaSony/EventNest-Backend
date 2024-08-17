@@ -11,7 +11,7 @@ export const userRoutes = (dependencies: IDependencies) => {
   const router = Router();
 
  
-  // router.use(authenticate);
+  router.use(authenticate);
 
   router.route("/listUsers").get(listUsers);
   router.route("/listHosts").get(listHosts);
@@ -19,7 +19,7 @@ export const userRoutes = (dependencies: IDependencies) => {
   router.route("/updateUser").post(updateUser);
 
   
-  router.get('/details',authenticate, getUserDetails);
+  router.get('/details', getUserDetails);
 
   return router;
 };

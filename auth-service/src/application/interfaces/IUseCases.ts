@@ -1,4 +1,5 @@
 import { ICheckUserEmailUseCase, ILoginUserUseCase, ISignupUserUseCase, IVerifyOtpUseCase,IIsExistUseCase,IUpdateUserUseCase } from "../../domain/useCaseInterfaces";
+import { User } from "../../infrastructure/database/mongoDB/models/loginCredentials";
 import { IDependencies } from "./IDependencies";
 
 export interface IUseCases {
@@ -9,3 +10,4 @@ export interface IUseCases {
     isExistUseCase: (dependencies: IDependencies) => IIsExistUseCase; 
     updateUserUseCase: (dependencies: IDependencies) => IUpdateUserUseCase;
 }
+

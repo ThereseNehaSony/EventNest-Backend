@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
-import jwt from 'jsonwebtoken';
-import {User} from '../../infrastructure/database/mongoDB/models/loginCredentials'; // Adjust the import according to your project structure
 
-// Generate and send OTP
+import {User} from '../../infrastructure/database/mongoDB/models/loginCredentials';
+
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body;
   
@@ -17,17 +16,12 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 
     const otp = crypto.randomInt(1000, 9999).toString();
 
-    // Save OTP and expiration time in user document
-    // use= otp;
-    // user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-    // await user.save();
-
-    // Send OTP via email
+   
     const transporter = nodemailer.createTransport({
       service: 'Gmail',
       auth: {
-        user: process.env.AUTH_EMAIL, // your email
-        pass: process.env.AUTH_PASS, // your email password
+        user: process.env.AUTH_EMAIL, 
+        pass: process.env.AUTH_PASS, 
       },
     });
 
@@ -65,8 +59,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
 
     // Reset password
     user.password = newPassword;
-    // user.resetPasswordToken = undefined;
-    // user.resetPasswordExpires = undefined;
+    
     await user.save();
 
     res.status(200).json({ message: 'Password has been reset' });

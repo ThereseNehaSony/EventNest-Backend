@@ -11,7 +11,8 @@ export const getAllCategories = async ({page, limit}: any) => {
     const totalPage = Math.ceil(totalDocuments/limit)
     const data = {
       categories,
-      totalPage
+      totalPage,
+      currentPage: page,
     }
     return data
   } catch (error:any) {

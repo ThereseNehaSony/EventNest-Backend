@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/jsonwebtoken": "^9.0.6",
     "amqplib": "^0.10.4",
     "concurrently": "^8.2.2",
     "cookie-parser": "^1.4.6",

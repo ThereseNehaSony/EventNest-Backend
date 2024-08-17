@@ -1,7 +1,7 @@
 import { UserEntity } from "../../../../domain/entities/userEntity"
 import { User } from "../models/userModel"
 
-export const updateUser = async(id: string, phone: string ) => {
+export const updateUser = async(id: string, phone: string  ) => {
   try {
     console.log(phone);
     console.log('reached.......')

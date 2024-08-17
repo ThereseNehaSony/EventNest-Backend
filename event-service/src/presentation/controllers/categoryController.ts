@@ -13,11 +13,11 @@ export const getCategories = async (req: Request, res: Response) => {
   }
 };
 export const getActiveCategories = async (req: Request, res: Response) => {
-    console.log(("gdh"));
+   
     
     try {
       const categories = await Category.find({isBlocked:false});
-     console.log(categories);
+     
   
       res.status(200).json(categories);
     } catch (error) {

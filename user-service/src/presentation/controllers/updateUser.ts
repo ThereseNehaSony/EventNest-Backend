@@ -6,9 +6,9 @@ export const updateUserController = (dependencies: IDependencies) =>{
 
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
-          const {id, phone} = req.body
+          const {id, phone,address} = req.body
          
-          const response = await User.findByIdAndUpdate(id,{phone}, {new:true})
+          const response = await User.findByIdAndUpdate(id,{phone,address}, {new:true})
           console.log("🚀 ~ file: updateUser.ts:11 ~ return ~ response:", response)
           res.json({
             success: true,

@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import { userRoutes } from "../infrastructure/routes/userRoutes";
 import { dependencies } from "../config/dependencies";
 import cors from 'cors'
-//import { authenticate } from '../middleware/authMiddleware';
+
 import {  consumeUserCreated ,consumeHostStatusUpdate} from '../infrastructure/RabbitMQ/consumer'
 import { requestUserList, } from "../infrastructure/RabbitMQ/publisher";
 dotenv.config();
@@ -39,9 +39,10 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 app.listen(PORT, () => {
   console.log(`connected to user service at ${PORT}`);
-  // requestUserList()
+  
   consumeUserCreated();
-  consumeHostStatusUpdate()
+  // consumeHostStatusUpdate()
+  consumeHostStatusUpdate('userServiceQueue');
   
 });
 

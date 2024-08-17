@@ -18,9 +18,7 @@ export const signupController = (dependencies: IDependencies) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const userCredentials = req.body;
-      const userExist = await checkUserEmailUseCase(dependencies).execute(
-        req.body.email
-      );
+      const userExist = await checkUserEmailUseCase(dependencies).execute(req.body.email);
 
       if (userExist) {
         console.log(userExist,"userexist")
@@ -63,7 +61,7 @@ export const signupController = (dependencies: IDependencies) => {
          
          
 
-          // to check if it is google signup
+          // to check if  google signup
             if (!userCredentials.password) {
               userCredentials.password = await generatePassword();
               }

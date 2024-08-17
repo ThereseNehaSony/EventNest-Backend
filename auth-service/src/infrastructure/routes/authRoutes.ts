@@ -33,7 +33,7 @@ export const authRoutes = (dependencies: IDependencies) => {
     router.post('/verify-otp', verifyOtp);
     router.post('/reset-password', resetPassword);
 
-    router.post('/change-password', changePassword);
+    router.post('/change-password',authenticateJWT, changePassword);
 
     router.post("/send-otp", resendOtpController(dependencies));
     router.post('/refresh-token', refreshTokenController);

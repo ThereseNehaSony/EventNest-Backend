@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import { authRoutes } from "../infrastructure/routes/authRoutes";
 import { dependencies } from "../config/dependencies";
 import cors from 'cors'
-import { consumeUserListRequest,listenForUserBlockedEvents } from '../infrastructure/rabbitMQ/consumer'
+import { listenForUserBlockedEvents ,consumeHostStatusUpdate} from '../infrastructure/rabbitMQ/consumer'
 
 dotenv.config();
 const app: Application = express();
@@ -35,8 +35,11 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 
 app.listen(PORT, () => {
   console.log(`connected to auth service at ${PORT}`);
-  consumeUserListRequest()
+  
   listenForUserBlockedEvents()
+  // consumeHostStatusUpdate()
+  consumeHostStatusUpdate('authServiceQueue');
+
 });
 
 export default app;
