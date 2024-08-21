@@ -26,44 +26,7 @@ export const adminRoutes = (dependencies: IDependencies) => {
     
     router.route('/get-categories').get(getAllCategories)
     router.route('/add-event').post(addEvent)
-    router.post('/add-event', upload.single('image'), async (req, res) => {
-        console.log(req.body)
-        try {
-            
-            const file = req.file;
-    
-            
-            const {  caption } = req.body;
-    
-            
-            console.log('Form Data:', req.body);
-            console.log('Uploaded File:', file);
-    
-            if (!file) {
-                return res.status(400).json({ error: 'No file uploaded' });
-            }
-    
-    
-        
-            res.status(201).json({ message: 'Event created successfully' });
-        } catch (error) {
-            console.error('Error creating event:', error);
-            res.status(500).json({ error: 'Error creating event' });
-        }
-    });
-
-    router.post('/add-post',  async (req, res) => {
-        
-        
-        
-      console.log(req.body,'body')
-     
-      
-      
-        
-        res.status(201)
-      })
-      
+   
     router.route("/getAllEvents").get(getAllEvents);
     router.get('/:eventId', getEventById);
 

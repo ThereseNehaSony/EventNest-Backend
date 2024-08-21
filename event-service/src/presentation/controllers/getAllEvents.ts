@@ -11,6 +11,7 @@ export const getAllEventsController = (dependencies: IDependencies) => {
       const limit = Number(req.query?.limit) || 5;
   
       const data = await getAllEventsUseCase(dependencies).execute({page,limit})
+      
     //   console.log(" getAllEvents:", data)
       res.status(HttpStatusCode.OK).json({
         success: true,
