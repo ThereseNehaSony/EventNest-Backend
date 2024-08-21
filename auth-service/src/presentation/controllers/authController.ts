@@ -7,6 +7,7 @@ import { generateOtp } from "../../utils/otp/generateOtp";
 import { Otp } from "../../infrastructure/database/mongoDB/models/otp";
 import { sendOtp } from "../../utils/otp/sendOtp";
 import { hashPassword } from "../../utils/bcrypt/hashPassword";
+import { HttpStatusCode } from '../../utils/statusCodes/httpStatusCodes';
 
 interface CustomRequest extends Request {
   user?: {
@@ -23,7 +24,7 @@ export const refreshTokenController = async (req: Request, res: Response) => {
   const { refreshToken } = req.cookies;
 
   if (!refreshToken) {
-    return res.status(401).json({ message: "No refresh token provided" });
+    return res.status(HttpStatusCode.OK).json({ message: "No refresh token provided" });
   }
 
   try {
@@ -49,12 +50,12 @@ export const requestOtp = async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'User not found' });
     }
     console.log(user,"user..............")
     const otp = await generateOtp();
     await sendOtp(email,otp)
-    let emailExist = await Otp.findOne({ email: email });
+    const emailExist = await Otp.findOne({ email: email });
     let dbOtp;
     if (emailExist) {
       dbOtp = await Otp.findOneAndUpdate(
@@ -65,9 +66,9 @@ export const requestOtp = async (req: Request, res: Response) => {
       dbOtp = await Otp.create({ email: email, otp });
     }
     
-    res.status(200).json({ success: true, message: 'OTP sent to your email' });
+    res.status(HttpStatusCode.OK).json({ success: true, message: 'OTP sent to your email' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error requesting OTP', error });
+    res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'Error requesting OTP', error });
   }
 };
 
@@ -80,12 +81,12 @@ export const verifyOtp = async (req: Request, res: Response) => {
   try {
     const dbOtp = await Otp.findOne({ email });
     if (dbOtp && otp === dbOtp.otp) {
-      res.status(200).json({ success: true, message: 'OTP verified successfully' });
+      res.status(HttpStatusCode.OK).json({ success: true, message: 'OTP verified successfully' });
     } else {
-      res.status(400).json({ success: false, message: 'Invalid OTP' });
+      res.status(HttpStatusCode.BAD_REQUEST).json({ success: false, message: 'Invalid OTP' });
     }
   } catch (error: any) {
-    res.status(500).json({ success: false, message: 'Error verifying OTP' });
+    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Error verifying OTP' });
   }
 };
 
@@ -100,22 +101,22 @@ export const changePassword = async (req: CustomRequest, res: Response) => {
     console.log(user, "user.......");
     
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'User not found' });
     }
 
     user.password = await hashPassword(newPassword);
     console.log("changed......");
 
     await user.save();
-    res.status(200).json({ success: true, message: 'Password reset successful' });
+    res.status(HttpStatusCode.OK).json({ success: true, message: 'Password reset successful' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error resetting password', error });
+    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Error resetting password', error });
   }
 };
 
 
 export const resetPassword = async (req: Request, res: Response) => {
-  const { email, otp, newPassword } = req.body;
+  const { email,  newPassword } = req.body;
   console.log(req.body,"body..........")
   try {
     // const isValidOtp = await verifyOtp(email, otp); 
@@ -125,16 +126,16 @@ export const resetPassword = async (req: Request, res: Response) => {
     const user = await User.findOne({ email });
     console.log(user,"user.......")
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return res.status(HttpStatusCode.NOT_FOUND).json({ success: false, message: 'User not found' });
     }
     user.password = await hashPassword(newPassword);
 
     // user.password = newPassword; 
     console.log("changed......") 
     await user.save();
-    res.status(200).json({ success: true, message: 'Password reset successful' });
+    res.status(HttpStatusCode.OK).json({ success: true, message: 'Password reset successful' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error resetting password', error });
+    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Error resetting password', error });
   }
 };
 
@@ -145,9 +146,9 @@ export const resendOtpController = (dependencies: IDependencies) => {
       console.log(email, "email.............");
 
       // Check if the email exists in the OTP collection
-      let otpEntry = await Otp.findOne({ email });
+      const otpEntry = await Otp.findOne({ email });
       if (!otpEntry) {
-        return res.status(404).json({ message: "Email not found" });
+        return res.status(HttpStatusCode.NOT_FOUND).json({ message: "Email not found" });
       }
 
       // Generate new OTP
@@ -163,9 +164,9 @@ export const resendOtpController = (dependencies: IDependencies) => {
 
       if (dbOtp) {
         await sendOtp(email, otp); // Send the OTP
-        return res.status(200).json({ message: "OTP has been resent to your email" });
+        return res.status(HttpStatusCode.OK).json({ message: "OTP has been resent to your email" });
       } else {
-        return res.status(500).json({ message: "Failed to generate OTP" });
+        return res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: "Failed to generate OTP" });
       }
     } catch (error: any) {
       next(error);

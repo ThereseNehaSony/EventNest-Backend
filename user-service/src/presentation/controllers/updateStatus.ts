@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { IDependencies } from "../../application/interfaces/IDependencies";
 //import { publishUserBlockedEvent } from "../../infrastructure/RabbitMQ/publisher";
+import { HttpStatusCode } from "../../utils/statusCode/httpStatusCode";
 
 export const updateStatusController = (dependencies: IDependencies) => {
     const {useCases: {updateStatusUseCase}} = dependencies
@@ -18,7 +19,7 @@ export const updateStatusController = (dependencies: IDependencies) => {
       //  userEditedProducer(data)
       // publishUserBlockedEvent(id)
       // console.log('calldddd')
-        res.status(200).json({
+        res.status(HttpStatusCode.OK).json({
           success: true,
           data,
           message: "User Updated"

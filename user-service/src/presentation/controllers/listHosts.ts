@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { User } from "../../infrastructure/database/mongoDB/models/userModel"
+import { HttpStatusCode } from "../../utils/statusCode/httpStatusCode"
 
 export const listHostsController = () => {
   return async(req: Request, res: Response, next: NextFunction) => {
@@ -31,7 +32,7 @@ export const listHostsController = () => {
         users: formattedUsers,
         totalPage,
       };
-      res.status(200).json({
+      res.status(HttpStatusCode.OK).json({
         success: true,
         data,
         message: "users fetched!",

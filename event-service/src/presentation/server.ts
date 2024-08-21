@@ -1,9 +1,7 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
-
 import {adminRoutes} from "../infrastructure/routes/adminRoutes";
-
 import cors from 'cors'
 // import {  consumeUserListResponse } from '../infrastructure/RabbitMQ/consumer'
 // import { requestUserList } from "../infrastructure/RabbitMQ/publisher";
@@ -19,6 +17,7 @@ const corsOptions = {
   origin:'http://localhost:3000',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'] 
 }
 app.use(cors(corsOptions));
 
@@ -26,9 +25,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 
-// app.use("/admin", adminRoutes);
 app.use("/event", adminRoutes(dependencies));
 
 

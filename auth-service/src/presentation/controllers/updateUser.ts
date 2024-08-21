@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { IDependencies } from "../../application/interfaces/IDependencies";
-import { UserEntity } from "../../domain/entities";
 
 export const updateUserController = (dependencies: IDependencies) =>{
     const {useCases:{ updateUserUseCase}} = dependencies;

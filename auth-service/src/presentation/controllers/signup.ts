@@ -9,6 +9,7 @@ import { generateOtp } from "../../utils/otp/generateOtp";
 import { Otp } from "../../infrastructure/database/mongoDB/models/otp";
 import { sendOtp } from "../../utils/otp/sendOtp";
 import { publishUserCreated ,publishHostCreated} from "../../infrastructure/rabbitMQ/publisher";
+import { HttpStatusCode } from "../../utils/statusCodes/httpStatusCodes";
 
 export const signupController = (dependencies: IDependencies) => {
   const {
@@ -22,13 +23,13 @@ export const signupController = (dependencies: IDependencies) => {
 
       if (userExist) {
         console.log(userExist,"userexist")
-        return res.status(409).json({ message: "E-mail already in use" });
+        return res.status(HttpStatusCode.CONFLICT).json({ message: "E-mail already in use" });
         
       }
 
       if (!userCredentials.otp && userCredentials.password) {
         const otp = await generateOtp();
-        let emailExist = await Otp.findOne({ email: userCredentials.email });
+        const emailExist = await Otp.findOne({ email: userCredentials.email });
         let dbOtp;
         if (emailExist) {
           dbOtp = await Otp.findOneAndUpdate(
@@ -42,7 +43,7 @@ export const signupController = (dependencies: IDependencies) => {
         if (dbOtp) {
           sendOtp(userCredentials.email, otp).then((response) => {
             return res
-              .status(201)
+              .status(HttpStatusCode.CREATED)
               .json({ message: `An OTP has been sent to your email` });
           });
         }
@@ -64,6 +65,8 @@ export const signupController = (dependencies: IDependencies) => {
           // to check if  google signup
             if (!userCredentials.password) {
               userCredentials.password = await generatePassword();
+              userCredentials.isGoogleSignup = true;
+              console.log('Google signup detected. Password and OTP not needed.');
               }
         
           if (!otpVerified && userCredentials.otp) {
@@ -94,7 +97,7 @@ export const signupController = (dependencies: IDependencies) => {
                 publishHostCreated(result)
               }
              
-              let payload = {
+              const payload = {
                 _id: String(result?._id),
                 email: result?.email!,
                 role: result?.role!,
@@ -111,7 +114,7 @@ export const signupController = (dependencies: IDependencies) => {
                 sameSite: "none",
               });
 
-              res.status(201).json({
+              res.status(HttpStatusCode.CREATED).json({
                 success: true,
                 user: result,
                 message: "User created!",
@@ -120,7 +123,7 @@ export const signupController = (dependencies: IDependencies) => {
             }
           }
         } catch (error: any) {
-          return res.status(400).json({ message: error.message });
+          return res.status(HttpStatusCode.BAD_REQUEST).json({ message: error.message });
         }
       }
     } catch (error: any) {

@@ -13,5 +13,8 @@ export const signupValidation = Joi.object({
         .pattern(new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/))
         .required(),
     role: Joi
-        .string()
+        .string(),
+    isGoogleSignup: Joi
+        .boolean()
+        .optional(),
 })

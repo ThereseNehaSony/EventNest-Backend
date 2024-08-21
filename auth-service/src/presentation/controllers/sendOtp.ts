@@ -3,7 +3,8 @@ import { IDependencies } from "../../application/interfaces/IDependencies";
 import { generateOtp } from "../../utils/otp/generateOtp";
 import { Otp } from "../../infrastructure/database/mongoDB/models/otp";
 import { sendOtp } from "../../utils/otp/sendOtp";
-import { dependencies } from "../../config/dependencies";
+//import { dependencies } from "../../config/dependencies";
+import { HttpStatusCode } from "../../utils/statusCodes/httpStatusCodes";
 
 export const sendOtpController = (dependencies: IDependencies) => {
   const {
@@ -17,12 +18,12 @@ export const sendOtpController = (dependencies: IDependencies) => {
 
       if (!userExist) {
         console.log(userExist, "no user found");
-        return res.status(409).json({ message: "No user found" });
+        return res.status(HttpStatusCode.CONFLICT).json({ message: "No user found" });
       }
 
       if (!userCredentials.otp) {
         const otp = await generateOtp();
-        let emailExist = await Otp.findOne({ email: userCredentials.email });
+        const emailExist = await Otp.findOne({ email: userCredentials.email });
         let dbOtp;
         if (emailExist) {
           dbOtp = await Otp.findOneAndUpdate(
@@ -35,21 +36,21 @@ export const sendOtpController = (dependencies: IDependencies) => {
 
         if (dbOtp) {
           await sendOtp(userCredentials.email, otp);
-          return res.status(201).json({ message: "An OTP has been sent to your email" });
+          return res.status(HttpStatusCode.CREATED).json({ message: "An OTP has been sent to your email" });
           
         }
       } else {
-        let otpVerified = await verifyOtpUseCase(dependencies).execute(
+        const otpVerified = await verifyOtpUseCase(dependencies).execute(
           userCredentials.email,
           userCredentials.otp
         );
 
         if (!otpVerified) {
           console.log("OTP is incorrect");
-          return res.status(400).json({ message: "Otp is not verified" });
+          return res.status(HttpStatusCode.BAD_REQUEST).json({ message: "Otp is not verified" });
         }
 
-        return res.status(200).json({ message: "Otp is verified" });
+        return res.status(HttpStatusCode.OK).json({ message: "Otp is verified" });
       }
     } catch (error) {
       next(error);

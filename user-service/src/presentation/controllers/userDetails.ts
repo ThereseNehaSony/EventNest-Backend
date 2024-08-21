@@ -1,6 +1,7 @@
 
 import { Request, Response } from 'express';
 import { User } from '../../infrastructure/database/mongoDB/models/userModel'; 
+import { HttpStatusCode } from '../../utils/statusCode/httpStatusCode';
 
 interface CustomRequest extends Request {
   user?: {
@@ -16,17 +17,17 @@ export const getUserDetails = async (req: CustomRequest, res: Response) => {
     const userId = req.user?.id;
     // console.log(userId,"id......")
     if (!userId) {
-      return res.status(400).json({ message: 'User ID is missing in the request' });
+      return res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'User ID is missing in the request' });
     }
 
     const user = await User.findById(userId)
     if (!user) {
-      return res.status(404);
+      return res.status(HttpStatusCode.NOT_FOUND);
     }
 
-    res.status(200).json({ userDetails: user });
+    res.status(HttpStatusCode.OK).json({ userDetails: user });
   } catch (error) {
-    res.status(500).json({ message: 'Server Error', error });
+    res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Server Error', error });
   }
 };
 

@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { IDependencies } from "../../application/interfaces/IDependencies";
+import { HttpStatusCode } from '../../utils/statusCodes/httpStatusCode';
 
 export const getAllEventsController = (dependencies: IDependencies) => {
   const {useCases: {getAllEventsUseCase}} = dependencies;
@@ -10,8 +11,8 @@ export const getAllEventsController = (dependencies: IDependencies) => {
       const limit = Number(req.query?.limit) || 5;
   
       const data = await getAllEventsUseCase(dependencies).execute({page,limit})
-      console.log("🚀 ~ file: getAllEvents.ts:12 ~ return ~ data:", data)
-      res.status(200).json({
+    //   console.log(" getAllEvents:", data)
+      res.status(HttpStatusCode.OK).json({
         success: true,
         data,
         message: "Events retrieved successfully",

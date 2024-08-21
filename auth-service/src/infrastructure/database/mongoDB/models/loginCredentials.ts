@@ -29,6 +29,10 @@ const userSchema = new Schema ({
     },
     phone:{
         type: String
+    },
+    isGoogleSignup:{
+        type: Boolean,
+        default:false
     }
 }, {
     timestamps: true

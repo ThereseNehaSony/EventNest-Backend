@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { IDependencies } from "../../application/interfaces/IDependencies";
+import { HttpStatusCode } from "../../utils/statusCodes/httpStatusCodes";
 
 export const logoutController = (dependencies: IDependencies) => {
 
@@ -11,7 +12,7 @@ export const logoutController = (dependencies: IDependencies) => {
                 secure: true,
                 sameSite: "none"
             });
-            res.status(200).json({message:"Logged out"});
+            res.status(HttpStatusCode.OK).json({message:"Logged out"});
         } catch (error : any) {
             next(error)
         }

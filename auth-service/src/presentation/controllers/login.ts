@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { IDependencies } from "../../application/interfaces/IDependencies";
 import { UserEntity } from "../../domain/entities";
 import jwt from "jsonwebtoken";
-
+import { HttpStatusCode } from "../../utils/statusCodes/httpStatusCodes";
 
 export const loginController = (dependencies: IDependencies) => {
   const {
@@ -17,9 +17,9 @@ export const loginController = (dependencies: IDependencies) => {
       ).execute(userCredentials);
       if (user) {
         if (user.status === "blocked") {
-          return res.status(403).json({ message: "You are blocked." });
+          return res.status(HttpStatusCode.FORBIDDEN).json({ message: "You are blocked." });
         }
-        let payload = {
+        const payload = {
           _id: String(user?._id),
           email: user?.email!,
           role: user?.role!,
@@ -38,7 +38,7 @@ export const loginController = (dependencies: IDependencies) => {
         });
 
         
-        res.status(200).json({
+        res.status(HttpStatusCode.OK).json({
           success: true,
           user: user,
           message: "User verified!",

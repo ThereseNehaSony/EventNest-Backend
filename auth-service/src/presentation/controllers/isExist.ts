@@ -2,6 +2,7 @@
 import { NextFunction, Request, Response } from "express";
 import { IDependencies } from "../../application/interfaces/IDependencies";
 import { UserEntity } from "../../domain/entities";
+import { HttpStatusCode } from "../../utils/statusCodes/httpStatusCodes";
 
 export const isExistController = (dependencies: IDependencies) => {
     const { useCases: { isExistUseCase } } = dependencies;
@@ -18,9 +19,9 @@ export const isExistController = (dependencies: IDependencies) => {
             if (!user) {
                 throw new Error('User not found');
             } else if (user.status === "blocked") {
-                return res.status(401).json({ status: "ok", data: null });
+                return res.status(HttpStatusCode.UNAUTHORIZED).json({ status: "ok", data: null });
             } else {
-                return res.status(200).json({ status: "ok", data: user });
+                return res.status(HttpStatusCode.OK).json({ status: "ok", data: user });
             }
         } catch (error) {
             console.error('Error in isExistController:', error);

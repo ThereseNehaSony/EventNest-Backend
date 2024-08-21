@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Event } from '../../infrastructure/database/mongoDB/models/event';
+import { HttpStatusCode } from '../../utils/statusCodes/httpStatusCode'; 
 
 export const getEventsByHostName = async (req: Request, res: Response) => {
     const hostName = req.params.hostName;
@@ -11,9 +12,9 @@ export const getEventsByHostName = async (req: Request, res: Response) => {
         return res.status(404).json({ message: 'No events found for this host.' });
       }
       console.log(events,"events...........")
-      res.status(200).json({ events });
+      res.status(HttpStatusCode.OK).json({ events });
     } catch (error) {
       console.error('Error fetching events:', error);
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
     }
   };

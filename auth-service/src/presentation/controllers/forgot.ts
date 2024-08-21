@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
-
+import { HttpStatusCode } from '../../utils/statusCodes/httpStatusCodes';
 import {User} from '../../infrastructure/database/mongoDB/models/loginCredentials';
 
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
@@ -11,7 +11,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'User not found' });
     }
 
     const otp = crypto.randomInt(1000, 9999).toString();
@@ -35,7 +35,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     await transporter.sendMail(mailOptions);
   console.log(otp,"otp");
   
-    res.status(200).json({ message: 'OTP sent to email' });
+    res.status(HttpStatusCode.OK).json({ message: 'OTP sent to email' });
   } catch (error) {
     next(error);
   }
@@ -43,7 +43,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
 
 // Verify OTP and reset password
 export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-  const { email, otp, newPassword } = req.body;
+  const { email, newPassword } = req.body;
   console.log(req.body,"body..........")
 
   try {
@@ -54,7 +54,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
     });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
+      return res.status(HttpStatusCode.BAD_REQUEST).json({ message: 'Invalid or expired OTP' });
     }
 
     // Reset password
@@ -62,7 +62,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
     
     await user.save();
 
-    res.status(200).json({ message: 'Password has been reset' });
+    res.status(HttpStatusCode.OK).json({ message: 'Password has been reset' });
   } catch (error) {
     next(error);
   }

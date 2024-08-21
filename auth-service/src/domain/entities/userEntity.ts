@@ -1,11 +1,11 @@
-import { ObjectId, Types } from "mongoose";
+import { Types } from "mongoose";
 
-enum Role {
-    user = 'user',
-    admin = 'admin',
-    host ='host'
+// enum Role {
+//     user = 'user',
+//     admin = 'admin',
+//     host ='host'
     
-}
+// }
 
 export interface UserEntity {
     _id: Types.ObjectId,
@@ -15,6 +15,7 @@ export interface UserEntity {
     role: string;
     otp?: string;
     status?: string;
+    isGoogleSignup?: boolean
 }
 
 
