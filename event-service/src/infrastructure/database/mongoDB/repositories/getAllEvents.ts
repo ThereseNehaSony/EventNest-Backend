@@ -1,16 +1,16 @@
 import {Event } from "../models/event"
 
-export const getAllEvents = async ({page, limit}: any) => {
-  console.log("🚀 ~ file: getAllMovies.ts:4 ~ getAllMovies ~ page:", page)
+export const getAllEvents = async () => {
+ // console.log("🚀 ~ file: getAllMovies.ts:4 ~ getAllMovies ~ page:", page)
   try {
-    const skip = (page - 1) * limit;
-    const events = await Event.find().skip(skip).limit(limit)
+   // const skip = (page - 1) * limit;
+    const events = await Event.find()
     const totalDocuments = await Event.countDocuments();
-    console.log("🚀 ~ file: getAllEvents.ts:9 ~ getAllEvents ~ totalDocuments:", totalDocuments)
-    const totalPage = Math.ceil(totalDocuments/limit)
+   // console.log("🚀 ~ file: getAllEvents.ts:9 ~ getAllEvents ~ totalDocuments:", totalDocuments)
+   // const totalPage = Math.ceil(totalDocuments/limit)
     const data = {
       events,
-      totalPage
+     // totalPage
     }
     return data
   } catch (error:any) {

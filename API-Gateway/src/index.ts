@@ -2,6 +2,9 @@ import express, { Application } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import proxy from 'express-http-proxy';
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app: Application = express();
 const PORT: number = Number(process.env.PORT) || 4000;
@@ -23,31 +26,38 @@ app.use((req, res, next) => {
 });
 
 // Proxy to auth-service
-app.use('/auth', proxy('http://localhost:3001', {
+app.use('/auth', proxy(String(process.env.AUTH_SERVICE_URL), {
   proxyReqPathResolver: function(req) {
-    console.log(`Proxying request to: http://localhost:3001/auth${req.url}`);
+    console.log(`Proxying request to: ${process.env.AUTH_SERVICE_URL}/auth${req.url}`);
     return '/auth' + req.url;
   }
 }));
 // Proxy to user-service
-app.use('/user', proxy('http://localhost:3002', {
+app.use('/user', proxy(String(process.env.USER_SERVICE_URL), {
   proxyReqPathResolver: function(req) {
-    console.log(`Proxying request to: http://localhost:3002/user${req.url}`);
+    console.log(`Proxying request to: ${process.env.USER_SERVICE_URL}/user${req.url}`);
     return '/user' + req.url;
   }
 }));
 // Proxy to event-service
-app.use('/event', proxy('http://localhost:3003', {
+app.use('/event', proxy(String(process.env.EVENT_SERVICE_URL), {
   proxyReqPathResolver: function(req) {
-    console.log(`Proxying request to: http://localhost:3003/event${req.url}`);
+    console.log(`Proxying request to: ${process.env.EVENT_SERVICE_URL}/event${req.url}`);
     return '/event' + req.url;
   }
 }));
 // Proxy to host-service
-app.use('/host', proxy('http://localhost:3005', {
+app.use('/host', proxy(String(process.env.HOST_SERVICE_URL), {
   proxyReqPathResolver: function(req) {
-    console.log(`Proxying request to: http://localhost:3005/host${req.url}`);
+    console.log(`Proxying request to: ${process.env.HOST_SERVICE_URL}/host${req.url}`);
     return '/host' + req.url;
+  }
+}));
+// Proxy to payment-service
+app.use('/payment', proxy(String(process.env.PAYMENT_SERVICE_URL), {
+  proxyReqPathResolver: function(req) {
+    console.log(`Proxying request to: ${process.env.PAYMENT_SERVICE_URL}/payment${req.url}`);
+    return '/payment' + req.url;
   }
 }));
 

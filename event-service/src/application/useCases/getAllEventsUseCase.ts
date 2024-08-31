@@ -4,9 +4,9 @@ export const getAllEventsUseCase = (dependencies: IDependencies) => {
   const {repositories: {getAllEvents}} = dependencies;
 
   return{
-    execute: async( {page, limit}: any) => {
+    execute: async( ) => {
       try {
-        return await getAllEvents({page, limit})
+        return await getAllEvents()
       } catch (error: any) {
         throw new Error(error.message)
       }

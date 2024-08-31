@@ -20,7 +20,7 @@ export const sendOtp = async (email: string, otp: number | string) => {
     html: `<p>${message}</p> <p style="color: tomato; font-size: 25px; letter-spacing: 2px;"><b>${otp}</b></p><p>This Code <b>expires in ${1} minutes(s)</b>.</p>`,
   };
 
-  const result = transporter.sendMail(mailData, (error, info) => {
+  const result = transporter.sendMail(mailData, (error) => {
     return new Promise((resolve, reject) => {
       if (error) {
         console.log("Error occurred while sending the",error);

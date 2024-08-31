@@ -3,6 +3,7 @@ import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import { HttpStatusCode } from '../../utils/statusCodes/httpStatusCodes';
 import {User} from '../../infrastructure/database/mongoDB/models/loginCredentials';
+import logger from '../../utils/logger/logger';
 
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
   const { email } = req.body;
@@ -33,7 +34,7 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     };
 
     await transporter.sendMail(mailOptions);
-  console.log(otp,"otp");
+    logger.info(`otp is ${otp}`)
   
     res.status(HttpStatusCode.OK).json({ message: 'OTP sent to email' });
   } catch (error) {
@@ -49,8 +50,7 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
   try {
     const user = await User.findOne({
       email,
-    //   resetPasswordToken: otp,
-    //   resetPasswordExpires: { $gt: Date.now() },
+    
     });
 
     if (!user) {

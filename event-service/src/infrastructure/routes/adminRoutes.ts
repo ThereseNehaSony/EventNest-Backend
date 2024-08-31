@@ -6,7 +6,7 @@ import { IDependencies } from "../../application/interfaces/IDependencies";
 import { getCategories, addCategory ,updateCategoryStatus,getActiveCategories} from '../../presentation/controllers/categoryController';
 import { getEventsByHostName } from "../../presentation/controllers/getEvents";
 //import upload from "../../utils/uploadMiddleware";
-import { getEventById ,publishEvent,updateEventStatus} from "../../presentation/controllers/event";
+import { getEventById ,publishEvent,updateEventStatus,updateEvent,bookEvent,getUpcomingEvents} from "../../presentation/controllers/event";
 import multer from 'multer'
 
 const storage = multer.memoryStorage()
@@ -37,5 +37,10 @@ export const adminRoutes = (dependencies: IDependencies) => {
     router.post('/:eventId/:action', updateEventStatus);
 
     router.patch('/:eventId/publish', publishEvent )
+    router.patch('/:eventId', updateEvent);
+    router.post('/register',bookEvent)
+
+    router.get('/get-upcoming-events/:userName',getUpcomingEvents)
+   
     return router;
 }

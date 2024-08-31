@@ -54,5 +54,6 @@ export interface EventEntity {
   status: string;
   type: 'online' | 'offline'; 
   entryType: 'Paid' | 'Free'; 
-  isPublished: boolean
+  isPublished: boolean;
+   rejectionReason: string;
 }

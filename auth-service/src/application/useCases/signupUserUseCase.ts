@@ -8,8 +8,12 @@ export const signupUserUseCase = (dependencies: IDependencies) => {
         execute: async (data: UserEntity) => {
             try {
                 return await signup(data);
-            } catch (error: any) {
-                throw new Error(error?.message)
+            } catch (error: unknown) {
+                if (error instanceof Error) {
+                    throw new Error(error.message);
+                } else {
+                    throw new Error('An unknown error occurred');
+                }
             }
         }
     }

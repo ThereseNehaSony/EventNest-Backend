@@ -7,10 +7,10 @@ export const getAllEventsController = (dependencies: IDependencies) => {
 
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const page = Number(req.query?.page) || 1;
-      const limit = Number(req.query?.limit) || 5;
+      //const page = Number(req.query?.page) || 1;
+     // const limit = Number(req.query?.limit) || 5;
   
-      const data = await getAllEventsUseCase(dependencies).execute({page,limit})
+      const data = await getAllEventsUseCase(dependencies).execute()
       
     //   console.log(" getAllEvents:", data)
       res.status(HttpStatusCode.OK).json({

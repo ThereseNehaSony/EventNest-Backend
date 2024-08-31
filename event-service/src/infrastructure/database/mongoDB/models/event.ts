@@ -96,7 +96,11 @@ const eventSchema = new Schema<EventEntity>({
   isPublished:{
     type:Boolean,
     default:false
-  }
+  },
+  rejectionReason: {
+    type: String,
+    default: null,  
+  },
 }, {
   timestamps: true,
 });

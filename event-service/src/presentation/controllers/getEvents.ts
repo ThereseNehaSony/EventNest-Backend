@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
 import { Event } from '../../infrastructure/database/mongoDB/models/event';
 import { HttpStatusCode } from '../../utils/statusCodes/httpStatusCode'; 
+import logger from '../../utils/logger/logger';
 
 export const getEventsByHostName = async (req: Request, res: Response) => {
     const hostName = req.params.hostName;
-    console.log("hiiiiiiii");
     
-    console.log(hostName,"hostname....")
+    
+    //console.log(hostName,"hostname....")
+    logger.info(hostName,"hostname..")
   
     try {
       const events = await Event.find({ host: hostName });

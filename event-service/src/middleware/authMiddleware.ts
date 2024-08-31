@@ -41,3 +41,24 @@ export const authenticate = (req: CustomRequest, res: Response, next: NextFuncti
   }
 };
 
+
+
+
+export const checkUserStatus = async (req: CustomRequest, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user.id; 
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.status === 'blocked') { // Assuming 'status' field in the user document indicates whether the user is blocked
+      return res.status(403).json({ message: 'User is blocked' });
+    }
+
+    next(); // Proceed if the user is active
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};

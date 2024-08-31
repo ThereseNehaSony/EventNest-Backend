@@ -1,15 +1,8 @@
-// import { randomInt } from "crypto"
-
-// export const generateOtp = async () => {
-//     const value = await randomInt(1000, 10000)
-//     console.log(value,"otp..........")
-//     return value
-// }
-
 import { randomInt } from "crypto";
+import logger from "../logger/logger";
 
 export const generateOtp = async (): Promise<string> => {
   const value = await randomInt(1000, 10000);
-  console.log(value, "otp..........");
+  logger.info(`genenrated otp is ${value} `)
   return value.toString(); 
 };
