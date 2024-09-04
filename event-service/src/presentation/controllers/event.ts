@@ -4,6 +4,7 @@ import { HttpStatusCode } from '../../utils/statusCodes/httpStatusCode';
 import Booking from '../../infrastructure/database/mongoDB/models/bookings'
 import { log } from 'winston';
 import { Document } from 'mongoose';
+import { consumeEvent } from '../../infrastructure/RabbitMQ/consumer';
 
 interface CustomRequest extends Request {
   user?: {
@@ -33,11 +34,16 @@ export const getEventById = async (req: Request, res: Response) => {
     const event = await Event.findById(eventId);
     console.log(event, "event...........................");
 
+
+    const bookings = await Booking.find({ eventId: eventId });
+
+    // Calculate metrics
+    const attendeesCount = bookings.length;
     if (!event) {
       return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Event not found' });
     }
 
-    res.status(HttpStatusCode.OK).json(event);
+    res.status(HttpStatusCode.OK).json({event,attendeesCount});
   } catch (error) {
     console.error('Error fetching event:', error);
     res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
@@ -141,7 +147,7 @@ console.log(req.body,"bodyyyy");
      // eventName:eventName,
     //  eventDateTime,
       userName:userName,
-      userId:userId
+     // userId:userId
      // ticketQuantities,
     //  totalPrice,
     });
@@ -224,3 +230,15 @@ console.log(events,"events....");
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+const handlePaymentSuccessful = async (message: any) => {
+  const { userId, totalAmount, eventId } = message;
+
+  // Create a booking in the event service
+  await Booking.create({ userId, eventId, amountPaid: totalAmount,paymentType:'wallet' });
+  console.log('Booking created for event:', eventId);
+};
+
+// Start consuming the event
+consumeEvent('payment_exchange', 'booking_queue', 'payment.successful', handlePaymentSuccessful);

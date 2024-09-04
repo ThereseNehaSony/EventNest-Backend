@@ -51,7 +51,7 @@ export const signupController = (dependencies: IDependencies) => {
         try {
           let otpVerified = false;
 
-        console.log(otpVerified);
+           console.log(otpVerified);
       
           if (userCredentials.otp) {
             otpVerified = await verifyOtpUseCase(dependencies).execute(

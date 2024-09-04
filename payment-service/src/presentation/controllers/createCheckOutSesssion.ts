@@ -87,7 +87,7 @@ export const createCheckoutSessionController = async (
           product_data: {
             name: item.name,
           },
-          unit_amount: item.amount * 100, // Stripe expects the amount in cents
+          unit_amount: item.amount * 100, 
         },
         quantity: item.quantity,
       })),

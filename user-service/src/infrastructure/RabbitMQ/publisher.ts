@@ -37,3 +37,17 @@ export const publishUserBlockedEvent = async (userId: string, operation: 'block'
 };
 
 
+export const publishEvent = async (exchange: string, routingKey: string, message: any) => {
+  try {
+    const connection = await amqplib.connect(RABBITMQ_URL);
+  const channel = await connection.createChannel();
+ // const queue = 'user_blocked_event';
+    
+    await channel.assertExchange(exchange, 'direct', { durable: true });
+    channel.publish(exchange, routingKey, Buffer.from(JSON.stringify(message)));
+    
+    console.log('Event published:', routingKey);
+  } catch (error) {
+    console.error('Failed to publish event', error);
+  }
+};

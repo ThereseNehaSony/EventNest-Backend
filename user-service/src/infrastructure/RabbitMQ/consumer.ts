@@ -1,5 +1,6 @@
 import amqplib from 'amqplib';
 import { User } from '../database/mongoDB/models/userModel';
+import { Wallet } from '../database/mongoDB/models/wallet';
 
 const RABBITMQ_URL = 'amqp://127.0.0.1:5672';
 
@@ -28,6 +29,16 @@ export const consumeUserCreated = async () => {
           
           const updatedUser = await User.findByIdAndUpdate(user._id, user, { new: true, upsert: true });
           console.log('User updated:', updatedUser);
+
+          const wallet = new Wallet({
+            userId: updatedUser._id,
+            balance: 0,  
+            transactions: [], 
+          });
+          
+          await wallet.save();
+          console.log('Wallet created for user:', updatedUser._id);
+
         } catch (error) {
           console.error('Error updating user:', error);
         }
@@ -80,6 +91,7 @@ export const consumeHostStatusUpdate = async (queue: string) => {
       try {
         await User.findByIdAndUpdate(userId, { status: status });
         console.log(`User status updated for userId: ${userId}`);
+
         channel.ack(msg);
       } catch (error) {
         console.error('Error updating user status:', error);

@@ -3,7 +3,7 @@ import { authenticate } from "../../middleware/authMiddleware";
 import { getUserDetails } from "../../presentation/controllers/userDetails";
 import { controllers } from "../../presentation/controllers";
 import { IDependencies } from "../../application/interfaces/IDependencies";
-
+import { walletPayment } from "../../presentation/controllers/wallet";
 export const userRoutes = (dependencies: IDependencies) => {
   
   const { listUsers, updateStatus, listHosts, updateUser } = controllers(dependencies);
@@ -11,7 +11,7 @@ export const userRoutes = (dependencies: IDependencies) => {
   const router = Router();
 
  
-  router.use(authenticate);
+  // router.use(authenticate);
 
   router.route("/listUsers").get(listUsers);
   router.route("/listHosts").get(listHosts);
@@ -21,5 +21,6 @@ export const userRoutes = (dependencies: IDependencies) => {
   
   router.get('/details', getUserDetails);
 
+  router.post('/wallet/payment',walletPayment)
   return router;
 };

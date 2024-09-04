@@ -8,8 +8,11 @@ export interface UserEntity {
     role: string;
     phone: string;
     address: string;
+    
 
 }
+
+
 // import { ObjectId } from "mongoose";
 
 // export interface UserEntity {
