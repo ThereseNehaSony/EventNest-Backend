@@ -5,7 +5,7 @@ import { userRoutes } from "../infrastructure/routes/userRoutes";
 import { dependencies } from "../config/dependencies";
 import cors from 'cors'
 
-import {  consumeUserCreated ,consumeHostStatusUpdate} from '../infrastructure/RabbitMQ/consumer'
+import {  consumeUserCreated ,consumeHostStatusUpdate, consumeRefundMessages} from '../infrastructure/RabbitMQ/consumer'
 import { requestUserList, } from "../infrastructure/RabbitMQ/publisher";
 dotenv.config();
 const app: Application = express();
@@ -43,6 +43,7 @@ app.listen(PORT, () => {
   consumeUserCreated();
   // consumeHostStatusUpdate()
   consumeHostStatusUpdate('userServiceQueue');
+  consumeRefundMessages('refund_queue')
   
 });
 

@@ -30,7 +30,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface IBooking extends Document {
-  userName: string; // Assuming userId should be used instead of userName
+  userName: string; 
+  //// Assuming userId should be used instead of userName
   eventId: mongoose.Types.ObjectId; // Reference to the Event
   ticketType?: string;
   quantity?: number;
@@ -42,6 +43,7 @@ export interface IBooking extends Document {
 
 const BookingSchema: Schema = new Schema({
   userName: { type: String, required: false },
+
   eventId: { type: Schema.Types.ObjectId, ref: 'Event', required: false },
   ticketType: { type: String, required: false },
   quantity: { type: Number, required: false },

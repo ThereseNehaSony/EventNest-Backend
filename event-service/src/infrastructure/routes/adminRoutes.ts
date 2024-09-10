@@ -6,7 +6,7 @@ import { IDependencies } from "../../application/interfaces/IDependencies";
 import { getCategories, addCategory ,updateCategoryStatus,getActiveCategories} from '../../presentation/controllers/categoryController';
 import { getEventsByHostName } from "../../presentation/controllers/getEvents";
 //import upload from "../../utils/uploadMiddleware";
-import { getEventById ,publishEvent,updateEventStatus,updateEvent,bookEvent,getUpcomingEvents} from "../../presentation/controllers/event";
+import { getEventById ,publishEvent,updateEventStatus,updateEvent,bookEvent,getUpcomingEvents, getBookingDetails, saveBooking, getPastEvents, cancelBooking} from "../../presentation/controllers/event";
 import multer from 'multer'
 
 const storage = multer.memoryStorage()
@@ -34,13 +34,16 @@ export const adminRoutes = (dependencies: IDependencies) => {
     router.get('/get-categories', getCategories);
     router.post('/update-category-status', updateCategoryStatus);
     router.get('/host/:hostName', getEventsByHostName);
-    router.post('/:eventId/:action', updateEventStatus);
+    //router.post('/:eventId/:action', updateEventStatus);
 
     router.patch('/:eventId/publish', publishEvent )
     router.patch('/:eventId', updateEvent);
     router.post('/register',bookEvent)
 
     router.get('/get-upcoming-events/:userName',getUpcomingEvents)
-   
+    router.get('/get-past-events/:userName',getPastEvents)
+   router.get('/booking/:bookingId',getBookingDetails)
+   router.post('/booking/save',saveBooking);
+   router.post('/cancel/:bookingId',cancelBooking)
     return router;
 }
