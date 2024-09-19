@@ -2,10 +2,10 @@ import mongoose, { Schema, model } from 'mongoose';
 import { WalletEntity } from '../../../../domain/entities/walletEntity';
 
 export const TransactionSchema = new Schema({
-  id: { type: String, required: true },
-  amount: { type: Number, required: true },
-  type: { type: String, enum: ['credit', 'debit'], required: true },
-  date: { type: Date, default: Date.now, required: true },
+  id: { type: String, },
+  amount: { type: Number,  },
+  type: { type: String, enum: ['credit', 'debit'], },
+  date: { type: Date, default: Date.now },
   
 }, { _id: false });  
 

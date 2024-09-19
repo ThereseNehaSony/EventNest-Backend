@@ -51,8 +51,8 @@ const eventSchema = new Schema<EventEntity>({
    
   },
   location: {
-    type: LocationSchema,
-    
+    lat: { type: Number, required: true },
+    lng: { type: Number, required: true }
   },
   image: { 
     type: String, 

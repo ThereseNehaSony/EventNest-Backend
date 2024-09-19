@@ -6,7 +6,7 @@ import { paymentRoutes } from "../infrastructure/routes/paymentRoutes";
 import cors from 'cors'
 
 dotenv.config();
-console.log("Stripe API Key:,,,,,,,,,", process.env.STRIPE_SECRET_KEY);
+
 
 const app: Application = express();
 const PORT: number = Number(process.env.PORT) || 3007

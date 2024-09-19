@@ -11,7 +11,7 @@ interface Transaction {
 }
 
 export const walletPayment = async (req: Request, res: Response, next: NextFunction) => {
-  const { userId, totalAmount, eventId } = req.body;
+  const { userId, totalAmount, eventId,ticketType,quantity,userName } = req.body;
 
 
   try {
@@ -46,7 +46,7 @@ export const walletPayment = async (req: Request, res: Response, next: NextFunct
       await wallet.save();
 
      
-      await publishEvent('payment_exchange', 'payment.successful', { userId, totalAmount, eventId });
+      await publishEvent('payment_exchange', 'payment.successful', { userId, totalAmount, eventId ,ticketType,quantity,userName});
 
       
       res.status(200).json({ success: true, message: 'Payment successful' });
@@ -67,5 +67,42 @@ export const getWallet = async (req:Request, res:Response) => {
     res.json(wallet);
   } catch (err) {
     res.status(500).json({ message: 'Server error',  });
+  }
+};
+
+export const processRefund = async (req: Request, res: Response) => {
+  const { userId, amount } = req.body;
+
+  try {
+   
+    const wallet = await Wallet.findOne({ userId });
+    if (!wallet) {
+      return res.status(404).json({ success: false, message: 'Wallet not found for this user' });
+    }
+
+    if (amount <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid refund amount' });
+    }
+
+    
+    wallet.balance += amount; 
+
+    
+    const transaction: Transaction = {
+      id: new Date().toISOString(), 
+      type: 'credit',
+      date: new Date(),
+      amount: amount,
+     
+  };
+ 
+  
+  wallet.transactions.push(transaction);
+    await wallet.save();
+
+    return res.status(200).json({ success: true, message: 'Refund processed successfully', balance: wallet.balance });
+  } catch (error) {
+    console.error('Error processing refund:', error);
+    return res.status(500).json({ success: false, message: 'Error processing refund' });
   }
 };
