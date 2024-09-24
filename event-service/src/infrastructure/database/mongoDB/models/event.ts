@@ -30,6 +30,9 @@ const TicketDetailsSchema = new Schema({
   },
   price: { 
     type: Number 
+  },
+  ticketDescription:{
+    type: String, 
   }
 }, { _id: false }); 
 
@@ -52,7 +55,8 @@ const eventSchema = new Schema<EventEntity>({
   },
   location: {
     lat: { type: Number, required: true },
-    lng: { type: Number, required: true }
+    lng: { type: Number, required: true },
+    address: { type : String},
   },
   image: { 
     type: String, 

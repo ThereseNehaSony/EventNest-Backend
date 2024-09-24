@@ -34,7 +34,7 @@ export const adminRoutes = (dependencies: IDependencies) => {
     router.get('/get-categories', getCategories);
     router.post('/update-category-status', updateCategoryStatus);
     router.get('/host/:hostName', getEventsByHostName);
-    // router.post('/:eventId/:action', updateEventStatus);
+    router.post('/admin/:eventId/:action', updateEventStatus);
 
     router.patch('/:eventId/publish', publishEvent )
     router.patch('/:eventId', updateEvent);

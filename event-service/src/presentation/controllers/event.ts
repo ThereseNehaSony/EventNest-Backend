@@ -180,6 +180,7 @@ export const getUpcomingEvents = async (req: Request, res: Response) => {
         path: 'eventId',
         match: { startDate: { $gt: new Date() } }, 
       })
+      .sort({ bookingDate: -1 })
       .exec();
 
     
@@ -227,8 +228,20 @@ const handlePaymentSuccessful = async (message: any) => {
   const {userId, userName,quantity,ticketType, totalAmount,eventId, } = message;
 
 
-  await Booking.create({userName,userId,  eventId,quantity,ticketType, amountPaid: totalAmount,paymentType:'wallet' });
+  await Booking.create({
+    userName,
+    userId,  
+    eventId,
+    quantity,
+    ticketType,
+    amountPaid: totalAmount,
+    paymentType:'wallet' });
  
+
+    const eventUpdate = await Event.updateOne(
+      { _id: eventId, 'ticketDetails.type': ticketType },  
+      { $inc: { 'ticketDetails.$.seats': -quantity } }    
+    );
 };
 
 
@@ -254,12 +267,12 @@ export const getBookingDetails = async (req: Request, res: Response, next: NextF
         eventTime: event.startDate,
         type: event.type,
         quantity:  booking.quantity,
-        location: `${event.location.addressline1}, ${event.location.city}, ${event.location.state}`,
+        location: event.location,
         ticketType: booking.ticketType,
         status:booking.status,
         amountPaid: booking.amountPaid,
         //cancellationPolicy: event.description, 
-        qrCodeValue: `${booking._id}-${event._id}` 
+        // qrCodeValue: `${booking._id}-${event._id}` 
       }
     });
   } catch (error) {
@@ -415,7 +428,12 @@ export const savedOnlineBooking = async (req: Request, res: Response): Promise<v
         { $inc: { 'ticketDetails.$.seats': -quantity } }
       );
 
-     
+
+      // const eventUpdate = await Event.updateOne(
+      //   { _id: eventId, 'ticketDetails.type': ticketType },  // Find the event and ticket type
+      //   { $inc: { 'ticketDetails.$.seats': -quantity } }     // Decrease seats by the booked quantity
+      // );
+      
     
 
     
@@ -586,10 +604,10 @@ export const searchEvents = async (req: Request, res: Response) => {
       return res.status(400).json({ message: 'Search query is required' });
     }
 
-    // Use MongoDB's text search or regular expression for searching
-    const searchRegex = new RegExp(query, 'i'); // 'i' for case insensitive search
+    
+    const searchRegex = new RegExp(query, 'i'); 
 
-    // Search by title, description, or category
+
     const events = await Event.find({
       $or: [
         { title: searchRegex },
