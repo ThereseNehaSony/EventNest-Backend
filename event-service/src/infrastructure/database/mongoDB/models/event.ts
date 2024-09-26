@@ -28,6 +28,9 @@ const TicketDetailsSchema = new Schema({
     type: Number, 
      
   },
+  availableSeats:{
+    type:Number
+  },
   price: { 
     type: Number 
   },
@@ -105,6 +108,9 @@ const eventSchema = new Schema<EventEntity>({
     type: String,
     default: null,  
   },
+  cancellationReason:{
+    type:String
+  }
 }, {
   timestamps: true,
 });

@@ -5,6 +5,7 @@ export const TransactionSchema = new Schema({
   id: { type: String, },
   amount: { type: Number,  },
   type: { type: String, enum: ['credit', 'debit'], },
+
   date: { type: Date, default: Date.now },
   
 }, { _id: false });  

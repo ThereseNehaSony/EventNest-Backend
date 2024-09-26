@@ -6,7 +6,7 @@ import { IDependencies } from "../../application/interfaces/IDependencies";
 import { getCategories, addCategory ,updateCategoryStatus,getActiveCategories} from '../../presentation/controllers/categoryController';
 import { getEventsByHostName } from "../../presentation/controllers/getEvents";
 //import upload from "../../utils/uploadMiddleware";
-import { getEventById ,publishEvent,updateEventStatus,updateEvent,bookEvent,getUpcomingEvents, getBookingDetails, saveBooking, getPastEvents, cancelBooking, verifyPaymentController, getAttendees, savedOnlineBooking, searchEvents} from "../../presentation/controllers/event";
+import { getEventById ,publishEvent,updateEventStatus,updateEvent,bookEvent,getUpcomingEvents, getBookingDetails, saveBooking, getPastEvents, cancelBooking, verifyPaymentController, getAttendees, savedOnlineBooking, searchEvents, cancelEvent} from "../../presentation/controllers/event";
 import multer from 'multer'
 
 const storage = multer.memoryStorage()
@@ -49,6 +49,8 @@ export const adminRoutes = (dependencies: IDependencies) => {
    router.get('/:eventId/attendees',getAttendees);
    router.post('/booking/save-online',savedOnlineBooking)
    router.get('/search/event', searchEvents);
+
+   router.post('/cancel-event/:eventId', cancelEvent);
 
    return router;
 }

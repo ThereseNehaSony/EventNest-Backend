@@ -6,6 +6,7 @@ export interface Transaction {
   amount: number;
   type: 'credit' | 'debit';
   date: Date;
+ 
 
 }
 

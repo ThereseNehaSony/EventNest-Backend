@@ -11,7 +11,7 @@ export const getEventsByHostName = async (req: Request, res: Response) => {
     logger.info(hostName,"hostname..")
   
     try {
-      const events = await Event.find({ host: hostName });
+      const events = await Event.find({ host: hostName }).sort({createdAt: -1});
       if (!events.length) {
         return res.status(404).json({ message: 'No events found for this host.' });
       }

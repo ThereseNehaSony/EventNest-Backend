@@ -7,6 +7,7 @@ interface Transaction {
   amount: number;
   type: 'credit' | 'debit'; 
   date: Date;
+ 
   
 }
 
@@ -36,9 +37,10 @@ export const walletPayment = async (req: Request, res: Response, next: NextFunct
           type: 'debit',
           date: new Date(),
           amount: totalAmount,
+       
          
       };
-     console.log(transaction,"trans...")
+    
       
       wallet.transactions.push(transaction);
 
@@ -57,16 +59,34 @@ export const walletPayment = async (req: Request, res: Response, next: NextFunct
       next(error);  
   }
 };
-export const getWallet = async (req:Request, res:Response) => {
+export const getWallet = async (req: Request, res: Response) => {
   try {
-    const wallet = await Wallet.findOne({ userId: req.params.userId });
+    const { userId } = req.params;
+    const page = parseInt(req.query.page as string) || 1; // Default to page 1
+    const limit = parseInt(req.query.limit as string) || 10; // Default to 10 items per page
+
+    const wallet = await Wallet.findOne({ userId });
+
     if (!wallet) {
       return res.status(404).json({ message: 'Wallet not found' });
     }
-    console.log(wallet,"wallet....")
-    res.json(wallet);
+
+    const totalTransactions = wallet.transactions.length;
+
+    // Sort transactions by date (latest first) and paginate
+    const transactions = wallet.transactions
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) // Latest first
+      .slice((page - 1) * limit, page * limit); // Pagination logic
+
+    res.json({
+      balance: wallet.balance,
+      transactions,
+      currentPage: page,
+      totalPages: Math.ceil(totalTransactions / limit),
+      totalTransactions,
+    });
   } catch (err) {
-    res.status(500).json({ message: 'Server error',  });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

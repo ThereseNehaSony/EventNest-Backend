@@ -8,6 +8,7 @@ import { consumeEvent } from '../../infrastructure/RabbitMQ/consumer';
 import { sendRefundMessage } from '../../infrastructure/RabbitMQ/publisher';
 import axios from 'axios';
 import Stripe from 'stripe';
+import QRCode from 'qrcode';
 
 const USER_SERVICE_URL = 'http://localhost:3002'
 
@@ -22,10 +23,13 @@ interface IEvent {
   startTime: string;
   location: string;
   imageUrl: string;
+  status:string;
+  cancellationReason:string
 }
 
 // Booking interface
 interface IBooking extends Document {
+  _id:string;
   userName: string;
   eventId: IEvent; // Assuming eventId references an Event document
   status: string;
@@ -34,23 +38,54 @@ interface IBooking extends Document {
 export const getEventById = async (req: Request, res: Response) => {
   try {
     const eventId = req.params.eventId;
-    
 
+    // Fetch the event details
     const event = await Event.findById(eventId);
-   
-
-    const bookings = await Booking.find({ eventId: eventId });
-
-    const attendeesCount = bookings.length;
     if (!event) {
       return res.status(HttpStatusCode.NOT_FOUND).json({ message: 'Event not found' });
     }
-    const totalAmountReceived = bookings.reduce((sum, booking) => sum + (booking.amountPaid || 0), 0);
-    const recentRegistrations = await Booking.find({ eventId: eventId })
-    .sort({ bookingDate: -1 }) 
-    .limit(5);
 
-    res.status(HttpStatusCode.OK).json({event,recentRegistrations,attendeesCount,totalAmountReceived});
+    // Fetch bookings for the event
+    const bookings = await Booking.find({ eventId: eventId });
+    const attendeesCount = bookings.length;
+
+    // Calculate total amount received
+    const totalAmountReceived = bookings.reduce((sum, booking) => sum + (booking.amountPaid || 0), 0);
+
+    // Get recent registrations (limit to 5 recent ones)
+    const recentRegistrations = await Booking.find({ eventId: eventId })
+      .sort({ bookingDate: -1 })
+      .limit(5);
+
+    // Group bookings by ticket type and calculate total sales using availableSeats from the event model
+    const salesByType = event.ticketDetails.map((ticketType: any) => {
+      // Find all bookings for the specific ticket type
+      const bookingsForType = bookings.filter(booking => booking.ticketType === ticketType.type);
+     
+      
+      // Use the availableSeats directly from the event model for the specific ticket type
+      const seatsLeft = ticketType.availableSeats;
+      const amountReceived = bookingsForType.reduce((sum, booking) => sum + (booking.amountPaid || 0), 0);
+
+
+
+
+      return {
+        type: ticketType.type,
+        seatsLeft,  // Use the availableSeats from the event model
+        amountReceived
+      };
+    });
+
+
+    // Respond with event details, recent registrations, attendees count, total amount received, and ticket sales data
+    res.status(HttpStatusCode.OK).json({
+      event,
+      recentRegistrations,
+      attendeesCount,
+      totalAmountReceived,
+      salesByType 
+    });
   } catch (error) {
     console.error('Error fetching event:', error);
     res.status(HttpStatusCode.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
@@ -240,13 +275,21 @@ const handlePaymentSuccessful = async (message: any) => {
 
     const eventUpdate = await Event.updateOne(
       { _id: eventId, 'ticketDetails.type': ticketType },  
-      { $inc: { 'ticketDetails.$.seats': -quantity } }    
+      { $inc: { 'ticketDetails.$.availableSeats': -quantity } }    
     );
 };
 
 
 consumeEvent('payment_exchange', 'booking_queue', 'payment.successful', handlePaymentSuccessful);
 
+async function generateQrCode(ticketId: string): Promise<string> {
+  try {
+    const qrCode = await QRCode.toDataURL(ticketId); // Generates QR code as base64 image
+    return qrCode;
+  } catch (error) {
+    throw new Error('Failed to generate QR code');
+  }
+}
 
 export const getBookingDetails = async (req: Request, res: Response, next: NextFunction) => {
   const { bookingId } = req.params;
@@ -255,26 +298,9 @@ export const getBookingDetails = async (req: Request, res: Response, next: NextF
     if (!booking) {
       return res.status(404).json({ success: false, message: 'Booking not found' });
     }
-
+    //const qrCode = await generateQrCode(booking._id.toString());
     const event = booking.eventId as any; 
 
-    res.json({
-      success: true,
-      data: {
-        eventImage: event.image,
-        eventName: event.title,
-        eventDate: event.startDate,
-        eventTime: event.startDate,
-        type: event.type,
-        quantity:  booking.quantity,
-        location: event.location,
-        ticketType: booking.ticketType,
-        status:booking.status,
-        amountPaid: booking.amountPaid,
-        //cancellationPolicy: event.description, 
-        // qrCodeValue: `${booking._id}-${event._id}` 
-      }
-    });
   } catch (error) {
     next(error);
   }
@@ -396,7 +422,7 @@ export const saveBooking = async (bookingData: BookingData) => {
 
     await Event.updateOne(
       { _id: eventId, 'ticketDetails.type': ticketType },
-      { $inc: { 'ticketDetails.$.seats': -quantity } }
+      { $inc: { 'ticketDetails.$.availableSeats': -quantity } }
     );
 
     return { success: true, data: savedBooking };
@@ -425,7 +451,7 @@ export const savedOnlineBooking = async (req: Request, res: Response): Promise<v
 
       const result = await Event.updateOne(
         { _id: eventId, 'ticketDetails.type': ticketType },
-        { $inc: { 'ticketDetails.$.seats': -quantity } }
+        { $inc: { 'ticketDetails.$.availableSeats': -quantity } }
       );
 
 
@@ -480,7 +506,7 @@ export const cancelBooking = async (req: Request, res: Response) => {
     const ticketDetail = event.ticketDetails.find((t) => t.type === ticketType);
 
     if (ticketDetail) {
-      ticketDetail.seats += seatsToRelease;  
+      ticketDetail.availableSeats += seatsToRelease;  
     };
     
 
@@ -620,5 +646,40 @@ export const searchEvents = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Error occurred while searching events' });
+  }
+};
+
+export const cancelEvent = async (req: Request, res: Response) => {
+  const { eventId } = req.params;
+  const { cancellationReason } = req.body;
+ console.log(req.body,"bodyyy");
+ 
+  // if (!mongoose.Types.ObjectId.isValid(eventId)) {
+  //   return res.status(400).json({ message: 'Invalid Event ID' });
+  // }
+
+  try {
+    const event = await Event.findById(eventId);
+
+    if (!event) {
+      return res.status(404).json({ message: 'Event not found' });
+    }
+
+    // Check if the event is already cancelled
+    // if (event.isCancelled) {
+    //   return res.status(400).json({ message: 'Event is already cancelled.' });
+    // }
+
+  
+    // Update event as cancelled
+    event.status = "Cancelled";
+    event.cancellationReason = cancellationReason;
+    await event.save();
+
+    // Optionally handle refund logic here...
+
+    return res.status(200).json({ message: 'Event cancelled successfully.' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal Server Error', error });
   }
 };

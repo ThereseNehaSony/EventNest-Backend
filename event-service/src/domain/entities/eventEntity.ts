@@ -25,6 +25,7 @@ export interface TicketDetailEntity {
   type: 'Paid' | 'Free'; 
   seats: number;
   price?: number; 
+  availableSeats:number;
 }
 
 
@@ -56,4 +57,5 @@ export interface EventEntity {
   entryType: 'Paid' | 'Free'; 
   isPublished: boolean;
    rejectionReason: string;
+   cancellationReason:string;
 }
